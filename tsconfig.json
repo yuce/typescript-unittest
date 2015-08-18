@@ -2,10 +2,10 @@
 	"compilerOptions": {
 		"target": "ES5",
 		"module": "commonjs",
-		"out": "lib/unittest.js",
+		"out": "unittest.js",
 		"declaration": true
 	},
 	"files": [
-		"lib/unittest.ts"
+		"unittest.ts"
 	]
 }

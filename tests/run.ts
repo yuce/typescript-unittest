@@ -1,5 +1,8 @@
-/// <reference path="../lib/unittest.ts" />
+/// <reference path="../unittest.ts" />
 /// <reference path="test_unittest.ts" />
 
-let runner = new Unittest.TestRunner(Unittest.Test, {verbose: true});
+import UnitTest = require('../unittest');
+import UnitTestTests = require('./test_unittest');
+
+let runner = new UnitTest.TestRunner(UnitTestTests, {verbose: true});
 runner.run();

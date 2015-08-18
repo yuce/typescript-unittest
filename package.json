@@ -1,24 +1,28 @@
 {
-	"private": true,
-	"name": "typescript-unittest",
-	"version": "0.1",
-	"description": "Unit testing library for TypeScript",
-	"scripts": {
-		"test": "tsc tests/run.ts --module commonjs --target es5 --out tests/run.js && node tests/run.js"
-	},
-	"keywords": [
-		"typescript",
-		"node",
-		"unit test",
-		"testing"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/yuce/typescript-unittest.git"
-	},
-	"author": {
-		"name": "Yüce Tekol",
-		"url": "http://yuce.me"
-	},
-	"license": "MIT"
+  "name": "typescript-unittest",
+  "version": "0.1.0",
+  "description": "Unit testing library for TypeScript",
+  "main": "unittest.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "tsc tests/run.ts --module commonjs --target es5  && node tests/run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuce/typescript-unittest.git"
+  },
+  "keywords": [
+    "typescript",
+    "node",
+    "unittest",
+    "testing"
+  ],
+  "author": "Yüce Tekol <yucetekol@gmail.com> (http://yuce.me)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yuce/typescript-unittest/issues"
+  },
+  "homepage": "https://github.com/yuce/typescript-unittest"
 }
