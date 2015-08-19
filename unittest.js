@@ -1,16 +1,17 @@
-var UnittestError = (function () {
-    function UnittestError(cause) {
+var UnitTestError = (function () {
+    function UnitTestError(cause) {
         this._cause = cause;
     }
-    Object.defineProperty(UnittestError.prototype, "cause", {
+    Object.defineProperty(UnitTestError.prototype, "cause", {
         get: function () {
             return this._cause;
         },
         enumerable: true,
         configurable: true
     });
-    return UnittestError;
+    return UnitTestError;
 })();
+exports.UnitTestError = UnitTestError;
 (function (TestStatus) {
     TestStatus[TestStatus["SUCCESS"] = 0] = "SUCCESS";
     TestStatus[TestStatus["FAILURE"] = 1] = "FAILURE";
@@ -46,7 +47,7 @@ var TestCase = (function () {
                         status: TestStatus.SUCCESS });
                 }
                 catch (e) {
-                    if (e instanceof UnittestError) {
+                    if (e instanceof UnitTestError) {
                         var ue = e;
                         results.push({ name: testName,
                             msg: ue.cause,
@@ -61,6 +62,74 @@ var TestCase = (function () {
             }
         }
         return results;
+    };
+    TestCase.prototype.assertIs = function (target, value, failureText) {
+        var msg = failureText || this.makeMsg(target, '===', value);
+        this.test(target === value, msg);
+    };
+    TestCase.prototype.assertIsNot = function (target, value, failureText) {
+        var msg = failureText || this.makeMsg(target, '!==', value);
+        this.test(target !== value, msg);
+    };
+    TestCase.prototype.assertRaises = function (exceptionType, fun, self, params, failureText) {
+        var raised = false;
+        try {
+            fun.apply(self, params);
+        }
+        catch (e) {
+            if (e instanceof exceptionType) {
+                raised = true;
+            }
+        }
+        if (!raised) {
+            failureText = failureText || ['Exception was not raised.'].join(' ');
+            throw new UnitTestError(failureText);
+        }
+    };
+    TestCase.prototype.assertIn = function (elem, container, failureText) {
+        failureText = failureText || ['' + elem, 'is not in', '' + container].join(' ');
+        if (typeof container === 'string' && typeof elem === 'string') {
+            if (container.indexOf(elem) < 0) {
+                throw new UnitTestError(failureText);
+            }
+        }
+        else if (typeof container === 'object') {
+            if (container instanceof Array) {
+                var ac = container;
+                if (ac.indexOf(elem) < 0) {
+                    throw new UnitTestError(failureText);
+                }
+            }
+            else {
+                var oc = container;
+                var found = false;
+                for (var k in container) {
+                    if (k === elem) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new UnitTestError(failureText);
+                }
+            }
+        }
+        else {
+            throw new UnitTestError(failureText);
+        }
+    };
+    TestCase.prototype.assertNotIn = function (elem, container, failureText) {
+        failureText = failureText || ['' + elem, 'is in', '' + container].join(' ');
+        this.assertRaises(UnitTestError, this.assertIn, this, [elem, container], failureText);
+    };
+    TestCase.prototype.assertObjectContainsSubset = function (subset, container, failureText) {
+        failureText = failureText ||
+            ['' + container, 'does not contain', '' + subset].join(' ');
+        for (var k in subset) {
+            if (container[k] !== subset[k]) {
+                throw new UnitTestError(failureText);
+            }
+        }
     };
     TestCase.prototype.assertEqual = function (target, value, failureText) {
         var msg = failureText || this.makeMsg(target, '===', value);
@@ -110,7 +179,7 @@ var TestCase = (function () {
             this.assertEqual(target, value);
         }
         catch (e) {
-            if (e instanceof UnittestError) {
+            if (e instanceof UnitTestError) {
                 equiv = false;
             }
         }
@@ -118,7 +187,7 @@ var TestCase = (function () {
     };
     TestCase.prototype.test = function (p, failureText) {
         if (!p) {
-            throw new UnittestError(failureText);
+            throw new UnitTestError(failureText);
         }
     };
     TestCase.prototype.makeMsg = function (target, op, value) {

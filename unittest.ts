@@ -1,5 +1,5 @@
 
-class UnittestError {
+export class UnitTestError {
 	constructor(cause: string) {
 		this._cause = cause;
 	}
@@ -28,7 +28,6 @@ export interface TestCaseResult {
 	results: Array<TestResult>;
 }
 
-
 export class TestCase {
 	// Override
 	get name() {
@@ -56,8 +55,8 @@ export class TestCase {
 									status: TestStatus.SUCCESS});
 				}
 				catch (e) {
-					if (e instanceof UnittestError) {
-						let ue: UnittestError = e;
+					if (e instanceof UnitTestError) {
+						let ue: UnitTestError = e;
 						results.push({name: testName,
 										msg: ue.cause,
 										status: TestStatus.FAILURE});
@@ -72,6 +71,81 @@ export class TestCase {
 		}
 
 		return results;
+	}
+
+	assertIs(target, value, failureText?: string) {
+		let msg = failureText || this.makeMsg(target, '===', value);
+		this.test(target === value, msg);
+	}
+
+	assertIsNot(target, value, failureText?: string) {
+		let msg = failureText || this.makeMsg(target, '!==', value);
+		this.test(target !== value, msg);
+	}
+
+	assertRaises(exceptionType: any, fun: Function, self: Object,
+				 params: Array<any>, failureText?: string) {
+		let raised = false;
+		try {
+			fun.apply(self, params);
+		}
+		catch (e) {
+			if (e instanceof exceptionType) {
+				raised = true;
+			}
+		}
+		if (!raised) {
+			failureText = failureText || ['Exception was not raised.'].join(' ');
+			throw new UnitTestError(failureText);
+		}
+	}
+
+	assertIn(elem: any, container: any, failureText?: string) {
+		failureText = failureText || ['' + elem, 'is not in', '' + container].join(' ');
+		if (typeof container === 'string' && typeof elem === 'string') {
+			if ((<string>container).indexOf(elem) < 0) {
+				throw new UnitTestError(failureText);
+			}
+		}
+		else if (typeof container === 'object') {
+			if (container instanceof Array) {
+				let ac = <Array<any>>container;
+				if (ac.indexOf(elem) < 0) {
+					throw new UnitTestError(failureText);
+				}
+			}
+			else {
+				let oc = <Object>container;
+				let found = false;
+				for (let k in <Object>container) {
+					if (k === elem) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					throw new UnitTestError(failureText);
+				}
+			}
+		}
+		else {
+			throw new UnitTestError(failureText);
+		}
+	}
+
+	assertNotIn(elem: any, container: any, failureText?: string) {
+		failureText = failureText || ['' + elem, 'is in', '' + container].join(' ');
+		this.assertRaises(UnitTestError, this.assertIn, this, [elem, container], failureText);
+	}
+
+	assertObjectContainsSubset(subset: Object, container: Object, failureText?: string) {
+		failureText = failureText ||
+			['' + container, 'does not contain', '' + subset].join(' ');
+		for (let k in subset) {
+			if (container[k] !== subset[k]) {
+				throw new UnitTestError(failureText);
+			}
+		}
 	}
 
 	assertEqual(target, value, failureText?: string) {
@@ -125,7 +199,7 @@ export class TestCase {
 			this.assertEqual(target, value);
 		}
 		catch (e) {
-			if (e instanceof UnittestError) {
+			if (e instanceof UnitTestError) {
 				equiv = false;
 			}
 		}
@@ -134,7 +208,7 @@ export class TestCase {
 
 	private test(p: boolean, failureText) {
 		if (!p) {
-			throw new UnittestError(failureText);
+			throw new UnitTestError(failureText);
 		}
 	}
 
