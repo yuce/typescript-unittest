@@ -149,29 +149,29 @@ export class TestCase {
 	}
 
 	assertEqual(target, value, failureText?: string) {
-		let msg = failureText || this.makeMsg(target, '===', value);
+		let msg = failureText || this.makeMsg(target, '==', value);
 		this.test(target === value, msg);
 	}
 
 	assertNotEqual(target, value, failureText?: string) {
-		let msg = failureText || this.makeMsg(target, '!==', value);
+		let msg = failureText || this.makeMsg(target, '!=', value);
 		this.test(target !== value, msg);
 	}
 
 	assertEquivalent(target, value, failureText?: string) {
 		let msg = failureText || this.makeMsg(target, "==", value);
-		this.assertEqual(typeof target, typeof value, msg)
+		this.assertIs(typeof target, typeof value, msg)
 		// this.test(typeof target === typeof value, msg);
 		if (target === undefined || target === null) {
 			return;
 		}
 		if (typeof target === 'object') {
 			if (target === null) {
-				this.assertEqual(null, value, msg);
+				this.assertIs(null, value, msg);
 			}
 			if (target.length !== undefined) {
 				// This is an array
-				this.assertEqual(target.length, value.length, msg);
+				this.assertIs(target.length, value.length, msg);
 				for (let i = 0; i < target.length; i++) {
 					this.assertEquivalent(target[i], value[i]);
 				}
@@ -188,22 +188,26 @@ export class TestCase {
 			}
 		}
 		else {
-			this.assertEqual(target, value, msg);
+			this.assertIs(target, value, msg);
 		}
 	}
 
 	assertNotEquivalent(target, value, failureText?: string) {
-		let msg = failureText || this.makeMsg(target, '!==', value);
+		let msg = failureText || this.makeMsg(target, '!=', value);
 		var equiv: boolean = true;
 		try {
-			this.assertEqual(target, value);
+			this.assertIs(target, value);
 		}
 		catch (e) {
 			if (e instanceof UnitTestError) {
 				equiv = false;
 			}
 		}
-		this.assertEqual(false, equiv, msg);
+		this.assertIs(false, equiv, msg);
+	}
+
+	assertGreater(op1, op2) {
+		this.test(op1 > op2, this.makeMsg(op1, '>', op2));
 	}
 
 	private test(p: boolean, failureText) {

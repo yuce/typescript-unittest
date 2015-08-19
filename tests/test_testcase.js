@@ -56,6 +56,9 @@ var TestCaseTestCase = (function (_super) {
         this.assertRaises(UnitTest.UnitTestError, this.assertObjectContainsSubset, this, [{ c: 1 }, { a: 1 }]);
         this.assertRaises(UnitTest.UnitTestError, this.assertObjectContainsSubset, this, [{ a: 1, c: 1 }, { a: 1 }]);
     };
+    TestCaseTestCase.prototype.test_assertGreater = function () {
+        this.assertGreater(2, 1);
+    };
     return TestCaseTestCase;
 })(UnitTest.TestCase);
 exports.TestCaseTestCase = TestCaseTestCase;

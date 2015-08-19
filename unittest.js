@@ -132,27 +132,27 @@ var TestCase = (function () {
         }
     };
     TestCase.prototype.assertEqual = function (target, value, failureText) {
-        var msg = failureText || this.makeMsg(target, '===', value);
+        var msg = failureText || this.makeMsg(target, '==', value);
         this.test(target === value, msg);
     };
     TestCase.prototype.assertNotEqual = function (target, value, failureText) {
-        var msg = failureText || this.makeMsg(target, '!==', value);
+        var msg = failureText || this.makeMsg(target, '!=', value);
         this.test(target !== value, msg);
     };
     TestCase.prototype.assertEquivalent = function (target, value, failureText) {
         var msg = failureText || this.makeMsg(target, "==", value);
-        this.assertEqual(typeof target, typeof value, msg);
+        this.assertIs(typeof target, typeof value, msg);
         // this.test(typeof target === typeof value, msg);
         if (target === undefined || target === null) {
             return;
         }
         if (typeof target === 'object') {
             if (target === null) {
-                this.assertEqual(null, value, msg);
+                this.assertIs(null, value, msg);
             }
             if (target.length !== undefined) {
                 // This is an array
-                this.assertEqual(target.length, value.length, msg);
+                this.assertIs(target.length, value.length, msg);
                 for (var i = 0; i < target.length; i++) {
                     this.assertEquivalent(target[i], value[i]);
                 }
@@ -169,21 +169,24 @@ var TestCase = (function () {
             }
         }
         else {
-            this.assertEqual(target, value, msg);
+            this.assertIs(target, value, msg);
         }
     };
     TestCase.prototype.assertNotEquivalent = function (target, value, failureText) {
-        var msg = failureText || this.makeMsg(target, '!==', value);
+        var msg = failureText || this.makeMsg(target, '!=', value);
         var equiv = true;
         try {
-            this.assertEqual(target, value);
+            this.assertIs(target, value);
         }
         catch (e) {
             if (e instanceof UnitTestError) {
                 equiv = false;
             }
         }
-        this.assertEqual(false, equiv, msg);
+        this.assertIs(false, equiv, msg);
+    };
+    TestCase.prototype.assertGreater = function (op1, op2) {
+        this.test(op1 > op2, this.makeMsg(op1, '>', op2));
     };
     TestCase.prototype.test = function (p, failureText) {
         if (!p) {

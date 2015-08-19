@@ -60,4 +60,8 @@ export class TestCaseTestCase extends UnitTest.TestCase {
 			  			  [{a: 1, c: 1}, {a: 1}]);
 
 	}
+
+	test_assertGreater() {
+		this.assertGreater(2, 1);
+	}
 }
